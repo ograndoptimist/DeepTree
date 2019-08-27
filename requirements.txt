@@ -1,0 +1,14 @@
+# local package
+-e .
+
+# external requirements
+keras
+matplotlib
+pandas
+sklearn
+numpy
+unidecode
+tensorflow==1.13.1
+nltk
+treelib
+flask
