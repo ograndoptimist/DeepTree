@@ -25,7 +25,10 @@ class DataGenerator(keras.utils.Sequence):
                                        class_labels=read_dic(lookup_path))
 
     def __read_data(self):
-        return pd.read_csv(self.path, chunksize=self.batch_size, usecols=self.__usecols.values())
+        df = pd.read_csv(self.path, usecols=self.__usecols.values())
+        df = df.sample(int(0.5 * len(df)))
+        return ((input_data, output_data) for input_data, output_data in zip(df[self.__usecols['input']],
+                                                                             df[self.__usecols['output']]))
 
     def __len__(self):
         """
@@ -42,25 +45,21 @@ class DataGenerator(keras.utils.Sequence):
         else:
             check_intern = repass
 
-        for data_block in self.__data_object:
-            for cont, x, y in zip(range(data_block.shape[0]),
-                                  data_block[self.__usecols['input']],
-                                  data_block[self.__usecols['output']]):
-                item_input = self.__vectorizer.vectorize_input(x)
-                item_output = self.__vectorizer.vectorize_output(y)
+        for xy in self.__data_object:
+            item_input = self.__vectorizer.vectorize_input(xy[0])
+            item_output = self.__vectorizer.vectorize_output(xy[1])
 
-                if cont == 0 and input_data is None:
-                    input_data = np.copy(item_input)
-                    output_data = np.copy(item_output)
-                else:
-                    input_data = stack_array(arr1=input_data, arr2=item_input, dim=item_input.shape[0])
-                    output_data = stack_array(arr1=output_data, arr2=item_output, dim=item_output.shape[0])
+            if check_intern == 0 and input_data is None:
+                input_data = np.copy(item_input)
+                output_data = np.copy(item_output)
+            else:
+                input_data = stack_array(arr1=input_data, arr2=item_input, dim=item_input.shape[0])
+                output_data = stack_array(arr1=output_data, arr2=item_output, dim=item_output.shape[0])
 
-                check_intern += 1
+            check_intern += 1
 
-                if check_intern == self.batch_size:
-                    break
-            break
+            if check_intern == self.batch_size:
+                break
 
         if check_intern < self.batch_size:
             self.__reset_dataset()

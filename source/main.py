@@ -15,8 +15,6 @@ from source.data_processing.input.input_processing import InputProcessing
 
 from source.data_processing.train_scheduler.train_scheduler import TrainScheduler
 
-from source.model.deep_tree_model import DeepTreeModel
-
 from source.data_processing.models.scale_models import scaling_models
 
 from source.data_processing.data_augmentation import data_augmentation
@@ -28,7 +26,7 @@ def set_data(data_path, chunksize, usecols):
 
     print('Preprocessing data...')
     input_processing = InputProcessing(data_generator)
-    data_generator = input_processing.process_input(usecols)
+    data_generator = input_processing.process_input_generator(usecols)
     return data_generator
 
 
@@ -62,7 +60,7 @@ def build_datasets(tree_list, starting, dataset, queue_models, column_output):
     datasets_metrics.to_csv('../data/metrics/dataset_len.csv')
 
 
-def augment_data(path):
+def augment_data():
     print('Doing data augmentation')
     models_list = os.listdir('../data/dataset/training/')
     dataframe = pd.DataFrame(columns=['model', 'len'])
@@ -88,9 +86,9 @@ def run_main(path, usecols, chunksize):
     metadata, tree_list, starting, dataset = final_tree(dataset_generator, usecols)
     build_datasets(tree_list, starting, dataset, queue_models=metadata,
                    column_output=usecols['output'])
-    augment_data(path='../data/metrics/df_len.csv')
+    augment_data()
     del dataset
-    models_name, fail = train_models(metadata=metadata, usecols=usecols, epochs=15)
+    models_name, fail = train_models(metadata=metadata, usecols=usecols, epochs=30)
     print("Failed training {0} models".format(fail))
     print(fail)
     scaling_models(model_dir_path='../data/trained_models/models/')
@@ -100,5 +98,5 @@ def run_main(path, usecols, chunksize):
 
 if __name__ == '__main__':
     run_main(path='../data/dataset/processed_data/tabular_data.csv',
-             usecols={'input': 'termo', 'output': 'struct'},
+             usecols={'input': 'query_string', 'output': 'output'},
              chunksize=100000)

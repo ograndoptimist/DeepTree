@@ -98,8 +98,7 @@ def pick_category_dataframe(dataframe, category, column_output):
                 kit de cama 7 pecas                         cama-mesa-e-banho/colchas/colcha-casal
     """
     new_dataframe = dataframe.copy()
-    new_dataframe[column_output] = new_dataframe[column_output].apply(lambda x: x if x.split('/')[0] == category
-    else nan)
+    new_dataframe[column_output] = new_dataframe[column_output].apply(lambda x: x if x.split('/')[0] == category else nan)
     return new_dataframe.dropna()
 
 
@@ -199,7 +198,7 @@ def build_dataframe(tree_list, category_list, dataframe, column_output, queue_mo
     dataset_paths = []
     for category_root in queue_models:
         print('\tInitializing {0} dataset...'.format(str(category_root['root']) + '_level_'
-                                                  + str(category_root['level'])))
+                                                     + str(category_root['level'])))
         data_acc = split_data(dataframe=dataframe, level=category_root['level'],
                               parent_category=category_root['parent_category'],
                               category=category_root['root'].split('_')[-1], column_output=column_output)
@@ -216,6 +215,6 @@ def build_dataframe(tree_list, category_list, dataframe, column_output, queue_mo
                                   'len': len(data_acc)})
             data_acc.to_csv(save_local)
         print('\tFinishing {0} dataset...'.format(str(category_root['root']) + '_level_'
-                                               + str(category_root['level'])))
+                                                  + str(category_root['level'])))
         del data_acc
     return dataset_paths
