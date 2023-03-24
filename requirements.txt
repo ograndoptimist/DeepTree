@@ -8,7 +8,7 @@ pandas
 sklearn
 numpy
 unidecode
-tensorflow==1.13.1
+tensorflow==2.11.1
 nltk
 treelib
 flask
